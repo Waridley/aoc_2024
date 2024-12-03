@@ -4,10 +4,12 @@ use std::io::BufReader;
 
 pub mod day_01;
 pub mod day_02;
+pub mod day_03;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Input {
 	pub ex_in: String,
+	pub ex_in_2: Option<String>,
 	pub ex_ans_1: String,
 	pub ex_ans_2: String,
 	pub input: String,
@@ -35,7 +37,12 @@ macro_rules! decl_tests {
 		#[test]
 		fn part_2() -> anyhow::Result<()> {
 			let (day, input) = $crate::load_day_input(file!())?;
-			anyhow::ensure!(format!("{}", eval_pt_2(&input.ex_in)?) == input.ex_ans_2);
+			let ex_in = if let Some(ex_in_2) = &input.ex_in_2 {
+				ex_in_2
+			} else {
+				&input.ex_in
+			};
+			anyhow::ensure!(format!("{}", eval_pt_2(ex_in)?) == input.ex_ans_2);
 			println!("{day} pt 2 answer: {}", eval_pt_2(&input.input)?);
 			Ok(())
 		}

@@ -1,6 +1,4 @@
 use anyhow::Result;
-use std::cmp::Ordering;
-use std::collections::HashMap;
 use std::fmt::Display;
 use std::str::FromStr;
 
@@ -20,7 +18,6 @@ pub fn eval_pt_1(input: &str) -> Result<usize> {
 }
 
 pub fn eval_pt_2(input: &str) -> Result<usize> {
-	use Direction::*;
 	Ok(input
 		.lines()
 		.filter_map(|line| {
@@ -122,24 +119,24 @@ fn list_is_safe(mut list: impl Iterator<Item = i64>) -> bool {
 	true
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum Direction {
-	Increasing,
-	Decreasing,
-}
-
-impl Direction {
-	fn from_diff(diff: i64) -> Option<Self> {
-		use Direction::*;
-		if diff >= 1 && diff <= 3 {
-			Some(Increasing)
-		} else if diff >= -3 && diff <= -1 {
-			Some(Decreasing)
-		} else {
-			None
-		}
-	}
-}
+// #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+// enum Direction {
+// 	Increasing,
+// 	Decreasing,
+// }
+//
+// impl Direction {
+// 	fn from_diff(diff: i64) -> Option<Self> {
+// 		use Direction::*;
+// 		if diff >= 1 && diff <= 3 {
+// 			Some(Increasing)
+// 		} else if diff >= -3 && diff <= -1 {
+// 			Some(Decreasing)
+// 		} else {
+// 			None
+// 		}
+// 	}
+// }
 
 fn ok_but_print_err<T, E: Display>(result: Result<T, E>) -> Option<T> {
 	match result {
