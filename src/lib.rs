@@ -1,3 +1,7 @@
+#![feature(ascii_char)]
+#![feature(ascii_char_variants)]
+#![feature(strict_overflow_ops)]
+
 use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::BufReader;
@@ -5,6 +9,7 @@ use std::io::BufReader;
 pub mod day_01;
 pub mod day_02;
 pub mod day_03;
+pub mod day_04;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Input {
