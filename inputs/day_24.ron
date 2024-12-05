@@ -1,0 +1,7 @@
+#![enable(implicit_some)]
+(
+	ex_in: r#""#,
+	ex_ans_1: "",
+	ex_ans_2: "",
+	input: r#""#,
+)
