@@ -10,7 +10,7 @@ pub mod day_01;
 pub mod day_02;
 pub mod day_03;
 pub mod day_04;
-// pub mod day_05;
+pub mod day_05;
 // pub mod day_06;
 // pub mod day_07;
 // pub mod day_08;
@@ -32,6 +32,9 @@ pub mod day_04;
 // pub mod day_24;
 // pub mod day_25;
 
+fn init() {
+	let _ = env_logger::builder().is_test(true).try_init();
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Input {
@@ -55,6 +58,7 @@ macro_rules! decl_tests {
 	() => {
 		#[test]
 		fn part_1() -> anyhow::Result<()> {
+			crate::init();
 			let (day, input) = $crate::load_day_input(file!())?;
 			anyhow::ensure!(format!("{}", eval_pt_1(&input.ex_in)?) == input.ex_ans_1);
 			println!("{day} pt 1 answer: {}", eval_pt_1(&input.input)?);
@@ -63,6 +67,7 @@ macro_rules! decl_tests {
 
 		#[test]
 		fn part_2() -> anyhow::Result<()> {
+			crate::init();
 			let (day, input) = $crate::load_day_input(file!())?;
 			let ex_in = if let Some(ex_in_2) = &input.ex_in_2 {
 				ex_in_2
