@@ -1,4 +1,4 @@
-use anyhow::{anyhow, ensure, Result};
+use anyhow::Result;
 use log::{info, warn};
 use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
@@ -7,10 +7,9 @@ use std::str::FromStr;
 
 crate::decl_tests! {}
 
-fn eval_pt_1(input: &str) -> Result<impl Display> {
-	let input = input.parse()?;
-	let rule_map = Rules::build_map(&input)?;
-	let updates = input.updates;
+pub fn eval_pt_1(input: &str) -> Result<impl Display> {
+	let Input { rules, updates } = input.parse()?;
+	let rule_map = Rules::build_map(&rules)?;
 	let mut sum = 0;
 	for update in &updates {
 		if is_update_valid(update, &rule_map) {
@@ -23,10 +22,9 @@ fn eval_pt_1(input: &str) -> Result<impl Display> {
 	Ok(sum)
 }
 
-fn eval_pt_2(input: &str) -> Result<impl Display> {
-	let input = input.parse()?;
-	let rule_map = Rules::build_map(&input)?;
-	let mut updates = input.updates;
+pub fn eval_pt_2(input: &str) -> Result<impl Display> {
+	let Input { rules, mut updates } = input.parse()?;
+	let rule_map = Rules::build_map(&rules)?;
 	let mut sum = 0;
 	for update in &mut updates {
 		if !is_update_valid(update, &rule_map) {
@@ -119,7 +117,7 @@ struct Rules {
 }
 
 impl Rules {
-	fn build_map(Input { rules, updates }: &Input) -> Result<HashMap<u64, Self>> {
+	fn build_map(rules: &Vec<(u64, u64)>) -> Result<HashMap<u64, Self>> {
 		let mut rule_map = HashMap::<u64, Rules>::new();
 		for &(first, second) in rules {
 			let rules = rule_map.entry(first).or_default();

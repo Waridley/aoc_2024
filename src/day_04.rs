@@ -4,7 +4,7 @@ use std::fmt::Display;
 
 crate::decl_tests! {}
 
-fn eval_pt_1(input: &str) -> Result<impl Display> {
+pub fn eval_pt_1(input: &str) -> Result<impl Display> {
 	let Some(input) = input.as_ascii() else {
 		anyhow::bail!("expected ascii string");
 	};
@@ -20,7 +20,7 @@ fn eval_pt_1(input: &str) -> Result<impl Display> {
 	Ok(count)
 }
 
-fn eval_pt_2(input: &str) -> Result<impl Display> {
+pub fn eval_pt_2(input: &str) -> Result<impl Display> {
 	let Some(input) = input.as_ascii() else {
 		anyhow::bail!("expected ascii string");
 	};
