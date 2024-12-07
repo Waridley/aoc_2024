@@ -7,95 +7,13 @@ crate::decl_tests! {}
 fn eval_pt_1(input: &str) -> Result<impl Display> {
 	use Cell::*;
 	use Direction::*;
-	let mut start = (usize::MAX, usize::MAX);
-	let mut direction = Up;
-	let mut map = input
-		.lines()
-		.enumerate()
-		.map(|(line, s)| {
-			s.chars()
-				.enumerate()
-				.map(|(col, c)| {
-					Ok(match c {
-						'.' => Empty,
-						'#' => Obstacle,
-						'^' => {
-							start = (line, col);
-							direction = Up;
-							Visited
-						}
-						'v' => {
-							start = (line, col);
-							direction = Down;
-							Visited
-						}
-						'<' => {
-							start = (line, col);
-							direction = Left;
-							Visited
-						}
-						'>' => {
-							start = (line, col);
-							direction = Right;
-							Visited
-						}
-						c => return Err(anyhow!("Unexpected character {c}")),
-					})
-				})
-				.collect::<Result<Vec<_>>>()
-		})
-		.collect::<Result<Vec<_>>>()?;
-	let map_width = map[0].len();
-	ensure!(start.0 != usize::MAX && start.1 != usize::MAX);
-	loop {
-		let next = match direction {
-			Up => {
-				if start.0 == 0 {
-					break;
-				} else {
-					(-1, 0)
-				}
-			}
-			Down => {
-				if start.0 >= map.len() - 1 {
-					break;
-				} else {
-					(1, 0)
-				}
-			}
-			Left => {
-				if start.1 == 0 {
-					break;
-				} else {
-					(0, -1)
-				}
-			}
-			Right => {
-				if start.1 >= map_width - 1 {
-					break;
-				} else {
-					(0, 1)
-				}
-			}
-		};
-		let (next_line, next_col) = (
-			start.0.strict_add_signed(next.0),
-			start.1.strict_add_signed(next.1),
-		);
-		let next = &mut map[next_line][next_col];
-		match next {
-			next @ Obstacle => direction = direction.turn_right(),
-			_ => {
-				*next = Visited;
-				start = (next_line, next_col);
-			}
-		};
-	}
+	let (mut map, pos, mut direction) = build_map(input)?;
+	walk_path(&mut map, pos, direction);
 	let num_visited = map
 		.into_iter()
 		.flatten()
 		.filter(|cell| match cell {
-			Visited => true,
+			Visited { .. } => true,
 			_ => false,
 		})
 		.count();
@@ -103,16 +21,36 @@ fn eval_pt_1(input: &str) -> Result<impl Display> {
 }
 
 fn eval_pt_2(input: &str) -> Result<impl Display> {
-	Ok("todo")
+	use Cell::*;
+	use Direction::*;
+	let (map, pos, direction) = build_map(input)?;
+	let mut count = 0;
+	let map_width = map[0].len();
+	for (line, col) in (0..map.len())
+		.map(|line| (0..map_width).map(move |col| (line, col)))
+		.flatten()
+	{
+		if let Obstacle = map[line][col] {
+			continue
+		}
+		let mut map = map.clone();
+		map[line][col] = Obstacle;
+		match walk_path(&mut map, pos, direction) {
+			PathWalkResult::ExitedArea { .. } => {}
+			PathWalkResult::Looping => count += 1,
+		}
+	}
+	Ok(count)
 }
 
+#[derive(Debug, Clone)]
 enum Cell {
 	Empty,
 	Obstacle,
-	Visited,
+	Visited(HashSet<Direction>),
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
 enum Direction {
 	Up,
 	Down,
@@ -130,4 +68,127 @@ impl Direction {
 			Right => Down,
 		}
 	}
+}
+
+fn build_map(input: &str) -> Result<(Vec<Vec<Cell>>, (usize, usize), Direction)> {
+	use Cell::*;
+	use Direction::*;
+	
+	let mut start = (usize::MAX, usize::MAX);
+	let mut direction = Up;
+	let map = input
+		.lines()
+		.enumerate()
+		.map(|(line, s)| {
+			s.chars()
+				.enumerate()
+				.map(|(col, c)| {
+					Ok(match c {
+						'.' => Empty,
+						'#' => Obstacle,
+						'^' => {
+							start = (line, col);
+							direction = Up;
+							Visited(HashSet::from([direction]))
+						}
+						'v' => {
+							start = (line, col);
+							direction = Down;
+							Visited(HashSet::from([direction]))
+						}
+						'<' => {
+							start = (line, col);
+							direction = Left;
+							Visited(HashSet::from([direction]))
+						}
+						'>' => {
+							start = (line, col);
+							direction = Right;
+							Visited(HashSet::from([direction]))
+						}
+						c => return Err(anyhow!("Unexpected character {c}")),
+					})
+				})
+				.collect::<Result<Vec<_>>>()
+		})
+		.collect::<Result<Vec<_>>>()?;
+	ensure!(start.0 != usize::MAX && start.1 != usize::MAX);
+	Ok((map, start, direction))
+}
+
+fn walk_path(map: &mut Vec<Vec<Cell>>, mut position: (usize, usize), mut direction: Direction) -> PathWalkResult {
+	use Cell::*;
+	use Direction::*;
+	
+	let map_width = map[0].len();
+	loop {
+		let next = match direction {
+			Up => {
+				if position.0 == 0 {
+					break PathWalkResult::ExitedArea {
+						last_pos: position,
+						last_dir: direction,
+					};
+				} else {
+					(-1, 0)
+				}
+			}
+			Down => {
+				if position.0 >= map.len() - 1 {
+					break PathWalkResult::ExitedArea {
+						last_pos: position,
+						last_dir: direction,
+					};
+				} else {
+					(1, 0)
+				}
+			}
+			Left => {
+				if position.1 == 0 {
+					break PathWalkResult::ExitedArea {
+						last_pos: position,
+						last_dir: direction,
+					};
+				} else {
+					(0, -1)
+				}
+			}
+			Right => {
+				if position.1 >= map_width - 1 {
+					break PathWalkResult::ExitedArea {
+						last_pos: position,
+						last_dir: direction,
+					};
+				} else {
+					(0, 1)
+				}
+			}
+		};
+		let (next_line, next_col) = (
+			position.0.strict_add_signed(next.0),
+			position.1.strict_add_signed(next.1),
+		);
+		let next = &mut map[next_line][next_col];
+		match next {
+			Obstacle => direction = direction.turn_right(),
+			Visited(dirs) => {
+				if !dirs.insert(direction) {
+					return PathWalkResult::Looping
+				}
+				position = (next_line, next_col);
+			},
+			Empty => {
+				*next = Visited(HashSet::from([direction]));
+				position = (next_line, next_col);
+			}
+		};
+	}
+}
+
+enum PathWalkResult {
+	ExitedArea {
+		last_pos: (usize, usize),
+		last_dir: Direction,
+	},
+	Looping,
 }
