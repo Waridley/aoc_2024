@@ -16,7 +16,7 @@ pub mod day_05;
 pub mod day_06;
 pub mod day_07;
 pub mod day_08;
-// pub mod day_09;
+pub mod day_09;
 // pub mod day_10;
 // pub mod day_11;
 // pub mod day_12;
@@ -64,6 +64,7 @@ macro_rules! decl_tests {
 			crate::init();
 			let (day, input) = $crate::load_day_input(file!())?;
 			anyhow::ensure!(format!("{}", eval_pt_1(&input.ex_in)?) == input.ex_ans_1);
+			log::info!("example passed part 1");
 			println!("{day} pt 1 answer: {}", eval_pt_1(&input.input)?);
 			Ok(())
 		}
@@ -78,6 +79,7 @@ macro_rules! decl_tests {
 				&input.ex_in
 			};
 			anyhow::ensure!(format!("{}", eval_pt_2(ex_in)?) == input.ex_ans_2);
+			log::info!("example passed part 2");
 			println!("{day} pt 2 answer: {}", eval_pt_2(&input.input)?);
 			Ok(())
 		}
