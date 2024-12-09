@@ -31,7 +31,7 @@ fn eval_pt_2(input: &str) -> Result<impl Display> {
 		.flatten()
 	{
 		if let Obstacle = map[line][col] {
-			continue
+			continue;
 		}
 		let mut map = map.clone();
 		map[line][col] = Obstacle;
@@ -73,7 +73,7 @@ impl Direction {
 fn build_map(input: &str) -> Result<(Vec<Vec<Cell>>, (usize, usize), Direction)> {
 	use Cell::*;
 	use Direction::*;
-	
+
 	let mut start = (usize::MAX, usize::MAX);
 	let mut direction = Up;
 	let map = input
@@ -116,10 +116,14 @@ fn build_map(input: &str) -> Result<(Vec<Vec<Cell>>, (usize, usize), Direction)>
 	Ok((map, start, direction))
 }
 
-fn walk_path(map: &mut Vec<Vec<Cell>>, mut position: (usize, usize), mut direction: Direction) -> PathWalkResult {
+fn walk_path(
+	map: &mut Vec<Vec<Cell>>,
+	mut position: (usize, usize),
+	mut direction: Direction,
+) -> PathWalkResult {
 	use Cell::*;
 	use Direction::*;
-	
+
 	let map_width = map[0].len();
 	loop {
 		let next = match direction {
@@ -173,10 +177,10 @@ fn walk_path(map: &mut Vec<Vec<Cell>>, mut position: (usize, usize), mut directi
 			Obstacle => direction = direction.turn_right(),
 			Visited(dirs) => {
 				if !dirs.insert(direction) {
-					return PathWalkResult::Looping
+					return PathWalkResult::Looping;
 				}
 				position = (next_line, next_col);
-			},
+			}
 			Empty => {
 				*next = Visited(HashSet::from([direction]));
 				position = (next_line, next_col);

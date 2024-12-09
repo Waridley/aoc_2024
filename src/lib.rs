@@ -1,6 +1,7 @@
 #![feature(ascii_char)]
 #![feature(ascii_char_variants)]
 #![feature(strict_overflow_ops)]
+#![feature(array_windows)]
 
 use serde::{Deserialize, Serialize};
 use std::fs::File;
@@ -12,7 +13,7 @@ pub mod day_03;
 pub mod day_04;
 pub mod day_05;
 pub mod day_06;
-// pub mod day_07;
+pub mod day_07;
 // pub mod day_08;
 // pub mod day_09;
 // pub mod day_10;
