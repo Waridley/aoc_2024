@@ -2,6 +2,7 @@
 #![feature(ascii_char_variants)]
 #![feature(strict_overflow_ops)]
 #![feature(array_windows)]
+#![feature(unsigned_signed_diff)]
 
 use serde::{Deserialize, Serialize};
 use std::fs::File;
@@ -14,7 +15,7 @@ pub mod day_04;
 pub mod day_05;
 pub mod day_06;
 pub mod day_07;
-// pub mod day_08;
+pub mod day_08;
 // pub mod day_09;
 // pub mod day_10;
 // pub mod day_11;
