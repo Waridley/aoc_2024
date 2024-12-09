@@ -24,15 +24,17 @@ fn eval_pt_2(input: &str) -> Result<impl Display> {
 	use Cell::*;
 	use Direction::*;
 	let (map, pos, direction) = build_map(input)?;
+	let mut orig_walked_map = map.clone();
+	walk_path(&mut orig_walked_map, pos, direction);
+	let mut poss_placements = orig_walked_map.into_iter()
+		.enumerate()
+		.flat_map(|(line, cells)| cells.into_iter().enumerate().map(move |(col, cell)| (line, col, cell)))
+		.filter_map(|(line, col, cell)| match cell {
+			Visited(_) => Some((line, col)),
+			_ => None,
+		});
 	let mut count = 0;
-	let map_width = map[0].len();
-	for (line, col) in (0..map.len())
-		.map(|line| (0..map_width).map(move |col| (line, col)))
-		.flatten()
-	{
-		if let Obstacle = map[line][col] {
-			continue;
-		}
+	for (line, col) in poss_placements {
 		let mut map = map.clone();
 		map[line][col] = Obstacle;
 		match walk_path(&mut map, pos, direction) {
